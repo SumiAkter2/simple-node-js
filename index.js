@@ -40,6 +40,17 @@ async function run() {
 run().catch((err) => {
   console.log(err);
 });
+// app.get('/users', (req, res) => {
+//     if(req.query.name){
+//         const search = req.query.name;
+//         const filtered = users.filter(usr => usr.name.toLowerCase().   indexOf(search) >= 0);
+//         res.send(filtered);
+//     }
+//     else {
+//         res.send(users);
+//     }
+
+// });
 
 // app.post("/students", (req, res) => {
 //   console.log("post api call");
