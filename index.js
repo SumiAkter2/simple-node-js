@@ -7,9 +7,9 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 const students = [
-  { name: "Rasheduzzaman", id: 1, favSub: "Biology" },
-  { name: "Fariha Tabassum", id: 2, favSub: "Physics" },
-  { name: "Sumi Akter", id: 3, favSub: "Mathematics" },
+  { name: "Rasheduzzaman", favSub: "Biology" },
+  { name: "Fariha Tabassum", favSub: "Physics" },
+  { name: "Sumi Akter", favSub: "Mathematics" },
 ];
 
 const uri =
@@ -19,25 +19,36 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-client.connect((err) => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  console.log("database connect");
-  client.close();
+async function run() {
+  try {
+    const studentCollection = client.db("simpleNode").collection("students");
+
+    app.get("/students", async (req, res) => {
+      const cursor = await studentCollection.find({}).toArray();
+      res.send(cursor);
+    });
+    app.post("/students", async (req, res) => {
+      const student = req.body;
+      const result = await studentCollection.insertOne(student);
+      student.id = result.insertedId;
+      res.send(student);
+    });
+  } finally {
+    // await client.close();
+  }
+}
+run().catch((err) => {
+  console.log(err);
 });
 
-app.get("/students", (req, res) => {
-  res.send(students);
-});
-
-app.post("/students", (req, res) => {
-  console.log("post api call");
-  const student = req.body;
-  student.id = students.length + 1;
-  students.push(student);
-  res.send(student);
-  console.log(student);
-});
+// app.post("/students", (req, res) => {
+//   console.log("post api call");
+//   const student = req.body;
+//   student.id = students.length + 1;
+//   students.push(student);
+//   res.send(student);
+//   console.log(student);
+// });
 
 app.get("/", (req, res) => {
   res.send("Simple node js connecting 2023");
